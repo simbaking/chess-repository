@@ -30,6 +30,10 @@ public class GamePanel extends JPanel implements Runnable{
 	Piece activeP, checkingP;
 	public static Piece castlingP;
 	
+	public static final int WHITEWON = 0;
+	public static final int BLACKWON = 1;
+	public static final int TIE = 3;
+	int endCondition;
 	public static final int WHITE = 0;
 	public static final int BLACK = 1;
 	int currentColor = WHITE;
@@ -41,6 +45,8 @@ public class GamePanel extends JPanel implements Runnable{
 	boolean resign;
 	boolean gameover;
 	boolean stalemate;
+	boolean whiteOfferedTie;
+	boolean blackOfferedTie;
 	
 	public GamePanel() {
 		
@@ -61,6 +67,33 @@ public class GamePanel extends JPanel implements Runnable{
 	        @Override
 	        public void actionPerformed(ActionEvent e) {
 	        	blackResign();
+	        }
+	        
+	    });
+	    
+	    JButton whiteOfferTie = new JButton("Offer Tie (white)");
+		JButton blackOfferTie = new JButton("Offer Tie (black)");
+
+	    whiteOfferTie.addActionListener(new ActionListener() {
+	        @Override
+	        public void actionPerformed(ActionEvent e) {
+	        	
+	        	whiteOfferedTie = true;
+	        	whiteOfferTie.setOpaque(true);
+	        	whiteOfferTie.setText("Offered Tie (white)");
+	        	
+	        }
+	        
+	    });
+
+	    blackOfferTie.addActionListener(new ActionListener() {
+	        @Override
+	        public void actionPerformed(ActionEvent e) {
+	        	
+	        	blackOfferedTie = true;
+	        	blackOfferTie.setOpaque(true);
+	        	blackOfferTie.setText("Offered Tie (white)");
+	        	
 	        }
 	        
 	    });
@@ -154,13 +187,19 @@ public class GamePanel extends JPanel implements Runnable{
 	    
 	    this.setLayout(null);
 	    
-	    whiteResign.setBounds(875, 725, 150, 50);
-	    blackResign.setBounds(875, 25, 150, 50);
+	    whiteResign.setBounds(800, 725, 150, 50);
+	    blackResign.setBounds(800, 25, 150, 50);
+	    whiteOfferTie.setBounds(950, 725, 150, 50);
+	    whiteOfferTie.setBackground(new Color(255, 96, 0));
+	    blackOfferTie.setBounds(950, 25, 150, 50);
+	    blackOfferTie.setBackground(new Color(255, 96, 0));
 	    whiteCountdownLabel.setBounds(875, 425, 150, 50);
 	    blackCountdownLabel.setBounds(875, 325, 150, 50);
 		
 	    this.add(whiteResign);
 	    this.add(blackResign);
+	    this.add(whiteOfferTie);
+	    this.add(blackOfferTie);
 	    this.add(whiteCountdownLabel);
 	    this.add(blackCountdownLabel);
 		addMouseMotionListener(mouse);
@@ -291,16 +330,21 @@ public class GamePanel extends JPanel implements Runnable{
 							castlingP.updatePosition();
 						}
 
-						checkingP = null;
+						checkingP = null;//reset checkingP before checking if in check or checkmate so it is null when mouse is away from checking square
 						
 						if(isKingInCheck() && isCheckmate()) {
+							
 							gameover = true;
-						}
-						
-						else if(isStalemate() && isKingInCheck() == false) {
-							stalemate = true;
+
 						}
 
+						else if(isStalemate() && isKingInCheck() == false) {
+							
+							stalemate = true;
+							endCondition = TIE;
+							
+						}
+						
 						else {
 
 							if(canPromote()) {
@@ -323,6 +367,13 @@ public class GamePanel extends JPanel implements Runnable{
 					}
 					
 				}
+				
+			}
+			
+			if(whiteOfferedTie && blackOfferedTie) {
+				
+				gameover = true;
+				endCondition = TIE;
 				
 			}
 			
@@ -809,6 +860,7 @@ public class GamePanel extends JPanel implements Runnable{
         resign = true;
         resignColor = WHITE;
         gameover = true;
+        endCondition = BLACKWON;
         
 	}
 	
@@ -817,6 +869,7 @@ public class GamePanel extends JPanel implements Runnable{
         resign = true;
         resignColor = BLACK;
         gameover = true;
+        endCondition = WHITEWON;
         
 	}
 	
@@ -918,23 +971,35 @@ public class GamePanel extends JPanel implements Runnable{
 			if(resign) {
 
 				if(resignColor == BLACK) {
-					s = "White wins";
+					s = "White Wins";
 				}
 				
 				else if(resignColor == WHITE) {
-					s = "Black wins";
+					s = "Black Wins";
 				}
 				
 			}
 			
 			else {
-
-				if(currentColor == WHITE || resign) {
-					s = "White wins";
+				
+				if(endCondition == TIE) {
+					
+					g2.setFont(new Font("Arial", Font.PLAIN, 90));
+					g2.setColor(Color.cyan);
+					g2.drawString("Tie", 338, 420);
+					
 				}
 				
 				else {
-					s = "Black wins";
+
+					if(currentColor == WHITE) {
+						s = "White Wins";
+					}
+					
+					else {
+						s = "Black Wins";
+					}
+					
 				}
 				
 			}
