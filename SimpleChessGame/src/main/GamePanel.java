@@ -1,8 +1,12 @@
 package main;
 
 import javax.swing.*;
+import javax.swing.Timer;
+
 import java.awt.*;
 import java.util.*;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
 
 import piece.*;
 
@@ -13,6 +17,10 @@ public class GamePanel extends JPanel implements Runnable{
 	public static final int HEIGHT = 800;
 	final int FPS = 60;
 	Thread gameThread;
+	Timer whiteTimer;
+	Timer blackTimer;
+	JLabel whiteCountdownLabel;
+	JLabel blackCountdownLabel;
 	Board board = new Board();
 	Mouse mouse = new Mouse();
 	
@@ -25,10 +33,12 @@ public class GamePanel extends JPanel implements Runnable{
 	public static final int WHITE = 0;
 	public static final int BLACK = 1;
 	int currentColor = WHITE;
+	int resignColor;
 	
 	boolean canMove;
 	boolean validSquare;
 	boolean promotion;
+	boolean resign;
 	boolean gameover;
 	boolean stalemate;
 	
@@ -36,6 +46,123 @@ public class GamePanel extends JPanel implements Runnable{
 		
 		setPreferredSize(new Dimension(WIDTH,HEIGHT));
 		setBackground(new Color(128, 64, 0));
+		JButton whiteResign = new JButton("Resign (white)");
+		JButton blackResign = new JButton("Resign (black)");
+
+	    whiteResign.addActionListener(new ActionListener() {
+	        @Override
+	        public void actionPerformed(ActionEvent e) {
+	        	whiteResign();
+	        }
+	        
+	    });
+
+	    blackResign.addActionListener(new ActionListener() {
+	        @Override
+	        public void actionPerformed(ActionEvent e) {
+	        	blackResign();
+	        }
+	        
+	    });
+	    
+	    int whiteDelay = 1000;
+	    whiteCountdownLabel = new JLabel("White Time : ");
+	    whiteCountdownLabel.setFont(new Font("Arial", Font.PLAIN, 17));
+	    whiteCountdownLabel.setForeground(new Color(255, 224, 128));
+	    
+	    whiteTimer = new Timer(whiteDelay, new ActionListener() {
+	    	
+	    	int minutesLeft = 10;
+	        int secondsLeft = 0;
+
+	        @Override
+	        public void actionPerformed(ActionEvent e) {
+	        	
+	        	if (minutesLeft >= 0) {
+
+		            if (secondsLeft > 0) {
+		            	
+		                secondsLeft--;
+		                whiteCountdownLabel.setText("White Time : " + minutesLeft + ":" + secondsLeft);
+		                
+		            } 
+		            
+		            else if(minutesLeft > 0) {
+		            		
+		            	minutesLeft--;
+			            secondsLeft+=60;
+			                
+		            }
+
+		            else {
+		            	
+		                ((Timer) e.getSource()).stop();
+		                whiteCountdownLabel.setText("Time's Up!");
+		                whiteResign();
+		                
+		            }	
+		            
+	            }
+	        	
+	        }
+	    });
+
+	    int blackDelay = 1000;
+	    blackCountdownLabel = new JLabel("Black Time : ");
+	    blackCountdownLabel.setFont(new Font("Arial", Font.PLAIN, 17));
+	    blackCountdownLabel.setForeground(new Color(255, 224, 128));
+	    
+	    blackTimer = new Timer(blackDelay, new ActionListener() {
+	    	
+	    	int minutesLeft = 10;
+	        int secondsLeft = 0;
+
+	        @Override
+	        public void actionPerformed(ActionEvent e) {
+	        	
+	        	if (minutesLeft >= 0) {
+
+		            if (secondsLeft > 0) {
+		            	
+		                secondsLeft--;
+		                blackCountdownLabel.setText("Black Time : " + minutesLeft + ":" + secondsLeft);
+		                
+		            } 
+		            
+		            else if(minutesLeft > 0) {
+		            		
+		            	minutesLeft--;
+			            secondsLeft+=60;
+			                
+		            }
+
+		            else {
+		            	
+		                ((Timer) e.getSource()).stop();
+		                blackCountdownLabel.setText("Time's Up!");
+		                blackResign();
+		                
+		            }	
+		            
+	            }
+	        	
+	        }
+	    });
+	    
+	    whiteTimer.start();
+	    
+	    
+	    this.setLayout(null);
+	    
+	    whiteResign.setBounds(875, 725, 150, 50);
+	    blackResign.setBounds(875, 25, 150, 50);
+	    whiteCountdownLabel.setBounds(875, 425, 150, 50);
+	    blackCountdownLabel.setBounds(875, 325, 150, 50);
+		
+	    this.add(whiteResign);
+	    this.add(blackResign);
+	    this.add(whiteCountdownLabel);
+	    this.add(blackCountdownLabel);
 		addMouseMotionListener(mouse);
 		addMouseListener(mouse);
 		
@@ -51,38 +178,38 @@ public class GamePanel extends JPanel implements Runnable{
 	
 	public void setPieces() {
 		
-		pieces.add(new Pawn(WHITE,0,6));
+		/*pieces.add(new Pawn(WHITE,0,6));
 		pieces.add(new Pawn(WHITE,1,6));
 		pieces.add(new Pawn(WHITE,2,6));
-		pieces.add(new Pawn(WHITE,3,6));
+		*/pieces.add(new Pawn(WHITE,3,6));/*
 		pieces.add(new Pawn(WHITE,4,6));
 		pieces.add(new Pawn(WHITE,5,6));
 		pieces.add(new Pawn(WHITE,6,6));
-		pieces.add(new Pawn(WHITE,7,6));
+		pieces.add(new Pawn(WHITE,7,6));*/
 		pieces.add(new Rook(WHITE,0,7));
 		pieces.add(new Rook(WHITE,7,7));
-		pieces.add(new Knight(WHITE,1,7));
+		/*pieces.add(new Knight(WHITE,1,7));
 		pieces.add(new Knight(WHITE,6,7));
 		pieces.add(new Bishop(WHITE,2,7));
 		pieces.add(new Bishop(WHITE,5,7));
-		pieces.add(new Queen(WHITE,3,7));
+		pieces.add(new Queen(WHITE,3,7));*/
 		pieces.add(new King(WHITE,4,7));
 		
-		pieces.add(new Pawn(BLACK,0,1));
+		/*pieces.add(new Pawn(BLACK,0,1));
 		pieces.add(new Pawn(BLACK,1,1));
 		pieces.add(new Pawn(BLACK,2,1));
 		pieces.add(new Pawn(BLACK,3,1));
 		pieces.add(new Pawn(BLACK,4,1));
 		pieces.add(new Pawn(BLACK,5,1));
 		pieces.add(new Pawn(BLACK,6,1));
-		pieces.add(new Pawn(BLACK,7,1));
+		pieces.add(new Pawn(BLACK,7,1));*/
 		pieces.add(new Rook(BLACK,0,0));
 		pieces.add(new Rook(BLACK,7,0));
-		pieces.add(new Knight(BLACK,1,0));
+		/*pieces.add(new Knight(BLACK,1,0));
 		pieces.add(new Knight(BLACK,6,0));
 		pieces.add(new Bishop(BLACK,2,0));
 		pieces.add(new Bishop(BLACK,5,0));
-		pieces.add(new Queen(BLACK,3,0));
+		pieces.add(new Queen(BLACK,3,0));*/
 		pieces.add(new King(BLACK,4,0));
 		
 	}
@@ -163,6 +290,8 @@ public class GamePanel extends JPanel implements Runnable{
 						if(castlingP != null) {
 							castlingP.updatePosition();
 						}
+
+						checkingP = null;
 						
 						if(isKingInCheck() && isCheckmate()) {
 							gameover = true;
@@ -171,7 +300,7 @@ public class GamePanel extends JPanel implements Runnable{
 						else if(isStalemate() && isKingInCheck() == false) {
 							stalemate = true;
 						}
-						
+
 						else {
 
 							if(canPromote()) {
@@ -221,6 +350,7 @@ public class GamePanel extends JPanel implements Runnable{
 		activeP.y = mouse.y - Board.HALF_SQUARE_SIZE;
 		activeP.col = activeP.getCol(activeP.x);
 		activeP.row = activeP.getRow(activeP.y);
+		
 		
 		if(activeP.canMove(activeP.col, activeP.row)) {
 
@@ -281,14 +411,7 @@ public class GamePanel extends JPanel implements Runnable{
 		
 		Piece king = getKing(true);
 		
-		if(activeP.canMove(king.col, king.row)) {
-			
-			checkingP = activeP;
-			return true;
-			
-		}
-		
-		else {
+		if(checkingP == null) {
 
 			for(Piece piece : simPieces) {
 
@@ -594,6 +717,9 @@ public class GamePanel extends JPanel implements Runnable{
 			
 			currentColor = BLACK;
 			
+			whiteTimer.stop();
+			blackTimer.start();
+			
 			for(Piece piece : pieces) {
 				
 				if(piece.color == BLACK) {
@@ -606,6 +732,9 @@ public class GamePanel extends JPanel implements Runnable{
 		else {
 			
 			currentColor = WHITE;
+			
+			blackTimer.stop();
+			whiteTimer.start();
 			
 			for(Piece piece : pieces) {
 				
@@ -675,6 +804,22 @@ public class GamePanel extends JPanel implements Runnable{
 		
 	}
 	
+	public void whiteResign() {
+
+        resign = true;
+        resignColor = WHITE;
+        gameover = true;
+        
+	}
+	
+	public void blackResign() {
+
+        resign = true;
+        resignColor = BLACK;
+        gameover = true;
+        
+	}
+	
 	public void paintComponent(Graphics g) {
 		
 		super.paintComponent(g);
@@ -721,15 +866,21 @@ public class GamePanel extends JPanel implements Runnable{
 		
 		if(promotion) {
 			
+			whiteCountdownLabel.setVisible(false);
+			blackCountdownLabel.setVisible(false);
 			g2.drawString("Promote to:", 840, 150);
 			
 			for(Piece piece : promoPieces) {
 				g2.drawImage(piece.image, piece.getX(piece.col), piece.getY(piece.row), Board.SQUARE_SIZE, Board.SQUARE_SIZE, null);
 			}
 			
+			
 		}
 		
 		else {
+			
+			whiteCountdownLabel.setVisible(true);
+			blackCountdownLabel.setVisible(true);
 
 			if(currentColor == WHITE) {
 				
@@ -746,13 +897,13 @@ public class GamePanel extends JPanel implements Runnable{
 			}
 			else {
 				
-				g2.drawString("Black's turn", 840, 250);
+				g2.drawString("Black's turn", 840, 300);
 
 				if(checkingP != null && checkingP.color == WHITE) {
 					
 					g2.setColor(Color.red);
-					g2.drawString("The King", 840, 100);
-					g2.drawString("is in check!", 840, 150);
+					g2.drawString("The King", 840, 150);
+					g2.drawString("is in check!", 840, 200);
 					
 				}
 				
@@ -764,12 +915,28 @@ public class GamePanel extends JPanel implements Runnable{
 			
 			String s = "";
 			
-			if(currentColor == WHITE) {
-				s = "White wins";
+			if(resign) {
+
+				if(resignColor == BLACK) {
+					s = "White wins";
+				}
+				
+				else if(resignColor == WHITE) {
+					s = "Black wins";
+				}
+				
 			}
 			
 			else {
-				s = "Black wins";
+
+				if(currentColor == WHITE || resign) {
+					s = "White wins";
+				}
+				
+				else {
+					s = "Black wins";
+				}
+				
 			}
 			
 			g2.setFont(new Font("Arial", Font.PLAIN, 90));

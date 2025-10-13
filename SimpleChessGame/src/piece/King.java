@@ -38,7 +38,8 @@ public class King extends Piece{
 		
 			if(moved == false) {
 				
-				if(targetCol == preCol + 2 && pieceIsOnStraightLine(targetCol,targetRow) == false) {
+				if(targetCol == preCol + 2 && pieceIsOnStraightLine(targetCol,targetRow) == false &&
+						straightLineIsControlled(targetCol, targetRow) == false) {
 					
 					for(Piece piece : GamePanel.simPieces) {
 						
@@ -53,7 +54,8 @@ public class King extends Piece{
 					
 				}
 				
-				if(targetCol == preCol - 2 && pieceIsOnStraightLine(targetCol,targetRow) == false) {
+				if(targetCol == preCol - 2 && pieceIsOnStraightLine(targetCol,targetRow) == false &&
+						straightLineIsControlled(targetCol, targetRow) == false) {
 					
 					Piece p[] = new Piece[2];
 					
