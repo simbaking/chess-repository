@@ -1,21 +1,24 @@
-package piece;
+package simpleChessGame.piece;
 
-import main.GamePanel;
-import main.Type;
 
-public class Queen extends Piece{
+import simpleChessGame.*;
+import simpleChessGame.chessGame.*;
+import simpleChessGame.chessGame.Type;
+import simpleChessGame.piece.*;
 
-	public Queen(int color, int col, int row) {
+public class Rook extends Piece{
+
+	public Rook(int color, int col, int row) {
 		
 		super(color, col, row);
 		
-		type = Type.QUEEN;
+		type = Type.ROOK;
 		
 		if(color == GamePanel.WHITE) {
-			image = getImage("/piece/white-queen");
+			image = getImage("/piece/white-rook");
 		}
 		else {
-			image = getImage("/piece/black-queen");
+			image = getImage("/piece/black-rook");
 		}
 		
 		
@@ -28,16 +31,6 @@ public class Queen extends Piece{
 			if(targetCol == preCol || targetRow == preRow) {
 				
 				if(isValidSquare(targetCol, targetRow) && pieceIsOnStraightLine(targetCol, targetRow) == false) {
-					
-					return true;
-					
-				}
-				
-			}
-			
-			if(Math.abs(targetCol - preCol) == Math.abs(targetRow - preRow)) {
-				
-				if(isValidSquare(targetCol, targetRow) && pieceIsOnDiagonalLine(targetCol, targetRow) == false) {
 					
 					return true;
 					

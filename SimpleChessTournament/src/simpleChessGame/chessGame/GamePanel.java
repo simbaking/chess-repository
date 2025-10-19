@@ -1,14 +1,21 @@
-package main;
+package simpleChessGame.chessGame;
 
 import javax.swing.*;
+
+
 import javax.swing.Timer;
+
+import main.Player;
 
 import java.awt.*;
 import java.util.*;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 
-import piece.*;
+import simpleChessGame.*;
+import simpleChessGame.chessGame.*;
+import simpleChessGame.chessGame.Type;
+import simpleChessGame.piece.*;
 
 public class GamePanel extends JPanel implements Runnable{
 	
@@ -19,11 +26,16 @@ public class GamePanel extends JPanel implements Runnable{
 	Thread gameThread;
 	Timer whiteTimer;
 	Timer blackTimer;
+	Timer totalTimer;
 	JLabel whiteCountdownLabel;
 	JLabel blackCountdownLabel;
+	JLabel totalCountdownLabel;
 	Board board = new Board();
 	Mouse mouse = new Mouse();
 	
+	public Player[] tournamentPlayers;
+	public ArrayList<Player> tournamentPlayersInGame;
+	public JButton[] tournamentGameOffers;
 	public static ArrayList<Piece> pieces = new ArrayList<>();
 	public static ArrayList<Piece> simPieces = new ArrayList<>();
 	ArrayList<Piece> promoPieces = new ArrayList<>();
@@ -38,6 +50,13 @@ public class GamePanel extends JPanel implements Runnable{
 	public static final int BLACK = 1;
 	int currentColor = WHITE;
 	int resignColor;
+	public int gameMinutes;
+	public int gameSeconds;
+	int whiteScore;
+	int blackScore;
+	public int whiteId;
+	public int blackId;
+
 	
 	boolean canMove;
 	boolean validSquare;
@@ -47,6 +66,8 @@ public class GamePanel extends JPanel implements Runnable{
 	boolean stalemate;
 	boolean whiteOfferedTie;
 	boolean blackOfferedTie;
+	boolean scoreSent = false;
+	public boolean scoreupdated = false;
 	
 	public GamePanel() {
 		
@@ -181,8 +202,49 @@ public class GamePanel extends JPanel implements Runnable{
 	        	
 	        }
 	    });
+
+	    int totalDelay = 1000;
+	    totalCountdownLabel = new JLabel("Total Time : ");
+	    totalCountdownLabel.setFont(new Font("Arial", Font.PLAIN, 17));
+	    totalCountdownLabel.setForeground(new Color(255, 224, 128));
+	    
+	    totalTimer = new Timer(totalDelay, new ActionListener() {
+	    	
+	    	int minutes = 0;
+	        int seconds = 0;
+
+	        @Override
+	        public void actionPerformed(ActionEvent e) {
+
+	            if (seconds < 60) {
+	            	
+	                seconds++;
+	                totalCountdownLabel.setText("Total Time : " + minutes + ":" + seconds);
+	                
+	            } 
+	            
+	            else {
+	            		
+	            	minutes++;
+		            seconds-=60;
+		                
+	            }
+
+	            if(gameover || stalemate){
+	            	
+	                ((Timer) e.getSource()).stop();
+	                totalCountdownLabel.setText("Final time : " + minutes + ":" + seconds);
+	                
+	            }	
+	            
+	            gameMinutes = minutes;
+                gameSeconds = seconds;
+	            
+	        }
+	    });
 	    
 	    whiteTimer.start();
+	    totalTimer.start();
 	    
 	    
 	    this.setLayout(null);
@@ -195,6 +257,7 @@ public class GamePanel extends JPanel implements Runnable{
 	    blackOfferTie.setBackground(new Color(255, 96, 0));
 	    whiteCountdownLabel.setBounds(875, 425, 150, 50);
 	    blackCountdownLabel.setBounds(875, 325, 150, 50);
+	    totalCountdownLabel.setBounds(875, 375, 150, 50);
 		
 	    this.add(whiteResign);
 	    this.add(blackResign);
@@ -202,6 +265,7 @@ public class GamePanel extends JPanel implements Runnable{
 	    this.add(blackOfferTie);
 	    this.add(whiteCountdownLabel);
 	    this.add(blackCountdownLabel);
+	    this.add(totalCountdownLabel);
 		addMouseMotionListener(mouse);
 		addMouseListener(mouse);
 		
@@ -215,40 +279,55 @@ public class GamePanel extends JPanel implements Runnable{
 		gameThread.start();
 	}
 	
+	public void launchGame(Player[] players, ArrayList<Player> playersInGame, JButton[] gameOffers, int whitePlayerId, int blackPlayerId) {
+		
+		
+		gameThread = new Thread(this);
+		gameThread.start();
+		
+		whiteId = whitePlayerId;
+		blackId = blackPlayerId;
+		tournamentPlayers = players;
+		tournamentPlayersInGame = playersInGame;
+		tournamentGameOffers = gameOffers;
+		
+		
+	}
+	
 	public void setPieces() {
 		
-		/*pieces.add(new Pawn(WHITE,0,6));
+		pieces.add(new Pawn(WHITE,0,6));
 		pieces.add(new Pawn(WHITE,1,6));
 		pieces.add(new Pawn(WHITE,2,6));
-		*/pieces.add(new Pawn(WHITE,3,6));/*
+		pieces.add(new Pawn(WHITE,3,6));
 		pieces.add(new Pawn(WHITE,4,6));
 		pieces.add(new Pawn(WHITE,5,6));
 		pieces.add(new Pawn(WHITE,6,6));
-		pieces.add(new Pawn(WHITE,7,6));*/
+		pieces.add(new Pawn(WHITE,7,6));
 		pieces.add(new Rook(WHITE,0,7));
 		pieces.add(new Rook(WHITE,7,7));
-		/*pieces.add(new Knight(WHITE,1,7));
+		pieces.add(new Knight(WHITE,1,7));
 		pieces.add(new Knight(WHITE,6,7));
 		pieces.add(new Bishop(WHITE,2,7));
 		pieces.add(new Bishop(WHITE,5,7));
-		pieces.add(new Queen(WHITE,3,7));*/
+		pieces.add(new Queen(WHITE,3,7));
 		pieces.add(new King(WHITE,4,7));
 		
-		/*pieces.add(new Pawn(BLACK,0,1));
+		pieces.add(new Pawn(BLACK,0,1));
 		pieces.add(new Pawn(BLACK,1,1));
 		pieces.add(new Pawn(BLACK,2,1));
 		pieces.add(new Pawn(BLACK,3,1));
 		pieces.add(new Pawn(BLACK,4,1));
 		pieces.add(new Pawn(BLACK,5,1));
 		pieces.add(new Pawn(BLACK,6,1));
-		pieces.add(new Pawn(BLACK,7,1));*/
+		pieces.add(new Pawn(BLACK,7,1));
 		pieces.add(new Rook(BLACK,0,0));
 		pieces.add(new Rook(BLACK,7,0));
-		/*pieces.add(new Knight(BLACK,1,0));
+		pieces.add(new Knight(BLACK,1,0));
 		pieces.add(new Knight(BLACK,6,0));
 		pieces.add(new Bishop(BLACK,2,0));
 		pieces.add(new Bishop(BLACK,5,0));
-		pieces.add(new Queen(BLACK,3,0));*/
+		pieces.add(new Queen(BLACK,3,0));
 		pieces.add(new King(BLACK,4,0));
 		
 	}
@@ -284,11 +363,83 @@ public class GamePanel extends JPanel implements Runnable{
 				delta --;
 			}
 			
+
+			if(tournamentPlayers != null) {
+				
+				for(Player player : tournamentPlayers) {
+					
+					boolean playing = false;
+					
+					for(Player playerInGame : tournamentPlayersInGame) {
+						
+						if(player == playerInGame) {
+							playing = true;
+						}
+						
+					}
+					
+					if(!playing) {
+						
+						for(int i = 0; i < tournamentPlayers.length; i++) {
+							
+							if(player == tournamentPlayers[i]) {
+								tournamentGameOffers[i].setText(10 + " min time controls");
+							}
+							
+						}
+						
+					}
+					
+				}
+				
+			}
+			
+			
+			if(this.getIsGameOver()) {
+				
+				whiteScore = this.getScore()[0];
+				blackScore = this.getScore()[1];
+				
+				
+				
+				if(!scoreSent) {
+					
+					if(tournamentPlayers != null) {
+
+						for(Player player : tournamentPlayers) {
+
+							if(player.id == whiteId) {
+								
+								player.score += whiteScore;
+
+								tournamentPlayersInGame.remove(player);
+								
+							}
+
+							if(player.id == blackId) {
+								
+								player.score += blackScore;
+								
+								tournamentPlayersInGame.remove(player);
+								
+							}
+							
+						}
+						
+					}
+					
+					scoreSent = true;
+					
+				}
+				
+			}
+			
+
 		}
 		
 		
 	}
-	
+
 	private void update() {
 		
 		if(promotion) {
@@ -873,6 +1024,118 @@ public class GamePanel extends JPanel implements Runnable{
         
 	}
 	
+	public int[] getScore(){
+		
+		if(gameover) {
+
+			int gameTime = (gameMinutes * 60) + gameSeconds;
+			int[] scores = new int[2];
+			
+			if(endCondition == WHITEWON) {
+				
+				scores[0] = gameTime * 3;
+				scores[1] = 0;
+				
+			}
+			
+			else if(endCondition == BLACKWON) {
+
+				scores[0] = 0;
+				scores[1] = gameTime * 3;
+				
+			}
+			
+			else if(endCondition == TIE) {
+
+				scores[0] = gameTime;
+				scores[1] = gameTime;
+				
+			}
+			
+			return scores;
+			
+		}
+		
+		return null;
+		
+	}
+
+	public int getWhiteScore() {
+
+		if(gameover) {
+
+			int gameTime = (gameMinutes * 60) + gameSeconds;
+			int score = 0;
+			
+			if(endCondition == WHITEWON) {
+				
+				score = gameTime * 3;
+				
+			}
+			
+			else if(endCondition == BLACKWON) {
+
+				score = 0;
+				
+			}
+			
+			else if(endCondition == TIE) {
+
+				score = gameTime;
+				
+			}
+			
+			return score;
+			
+		}
+		
+		return 0;
+		
+	}
+
+	public int getBlackScore() {
+
+		if(gameover) {
+
+			int gameTime = (gameMinutes * 60) + gameSeconds;
+			int score = 0;
+			
+			if(endCondition == WHITEWON) {
+				
+				score = 0;
+				
+			}
+			
+			else if(endCondition == BLACKWON) {
+
+				score = gameTime * 3;
+				
+			}
+			
+			else if(endCondition == TIE) {
+
+				score = gameTime;
+				
+			}
+			
+			return score;
+			
+		}
+		
+		return 0;
+		
+	}
+	
+	public boolean getIsGameOver() {
+		
+		if(gameover || stalemate) {
+			return true;
+		}
+		
+		return false;
+		
+	}
+	
 	public void paintComponent(Graphics g) {
 		
 		super.paintComponent(g);
@@ -921,6 +1184,7 @@ public class GamePanel extends JPanel implements Runnable{
 			
 			whiteCountdownLabel.setVisible(false);
 			blackCountdownLabel.setVisible(false);
+			totalCountdownLabel.setVisible(false);
 			g2.drawString("Promote to:", 840, 150);
 			
 			for(Piece piece : promoPieces) {
@@ -934,7 +1198,8 @@ public class GamePanel extends JPanel implements Runnable{
 			
 			whiteCountdownLabel.setVisible(true);
 			blackCountdownLabel.setVisible(true);
-
+			totalCountdownLabel.setVisible(true);
+			
 			if(currentColor == WHITE) {
 				
 				g2.drawString("White's turn", 840, 550);

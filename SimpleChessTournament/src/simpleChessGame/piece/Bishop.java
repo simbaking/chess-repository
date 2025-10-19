@@ -1,7 +1,11 @@
-package piece;
+package simpleChessGame.piece;
 
-import main.GamePanel;
-import main.Type;
+
+import simpleChessGame.*;
+import simpleChessGame.chessGame.*;
+import simpleChessGame.chessGame.Type;
+import simpleChessGame.piece.*;
+
 
 public class Bishop extends Piece{
 

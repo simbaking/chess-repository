@@ -1,14 +1,17 @@
-package piece;
+package simpleChessGame.piece;
 
 import java.awt.*;
+
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 
 import javax.imageio.ImageIO;
 
-import main.Board;
-import main.GamePanel;
-import main.Type;
+
+import simpleChessGame.*;
+import simpleChessGame.chessGame.*;
+import simpleChessGame.chessGame.Type;
+import simpleChessGame.piece.*;
 
 public class Piece {
 	
