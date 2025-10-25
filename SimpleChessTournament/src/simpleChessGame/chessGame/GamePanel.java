@@ -56,6 +56,7 @@ public class GamePanel extends JPanel implements Runnable{
 	int blackScore;
 	public int whiteId;
 	public int blackId;
+	public int gameId;
 
 	
 	boolean canMove;
@@ -67,7 +68,7 @@ public class GamePanel extends JPanel implements Runnable{
 	boolean whiteOfferedTie;
 	boolean blackOfferedTie;
 	boolean scoreSent = false;
-	public boolean scoreupdated = false;
+	public boolean scoreUpdated = false;
 	
 	public GamePanel() {
 		
@@ -279,12 +280,13 @@ public class GamePanel extends JPanel implements Runnable{
 		gameThread.start();
 	}
 	
-	public void launchGame(Player[] players, ArrayList<Player> playersInGame, JButton[] gameOffers, int whitePlayerId, int blackPlayerId) {
+	public void launchGame(Player[] players, ArrayList<Player> playersInGame, int tournamentGameId, JButton[] gameOffers, int whitePlayerId, int blackPlayerId) {
 		
 		
 		gameThread = new Thread(this);
 		gameThread.start();
 		
+		gameId = tournamentGameId;
 		whiteId = whitePlayerId;
 		blackId = blackPlayerId;
 		tournamentPlayers = players;
@@ -363,72 +365,52 @@ public class GamePanel extends JPanel implements Runnable{
 				delta --;
 			}
 			
-
-			if(tournamentPlayers != null) {
-				
-				for(Player player : tournamentPlayers) {
-					
-					boolean playing = false;
-					
-					for(Player playerInGame : tournamentPlayersInGame) {
-						
-						if(player == playerInGame) {
-							playing = true;
-						}
-						
-					}
-					
-					if(!playing) {
-						
-						for(int i = 0; i < tournamentPlayers.length; i++) {
-							
-							if(player == tournamentPlayers[i]) {
-								tournamentGameOffers[i].setText(10 + " min time controls");
-							}
-							
-						}
-						
-					}
-					
-				}
-				
-			}
-			
 			
 			if(this.getIsGameOver()) {
 				
 				whiteScore = this.getScore()[0];
 				blackScore = this.getScore()[1];
-				
-				
+				//System.out.println(whiteScore);
+				//System.out.println(blackScore);
 				
 				if(!scoreSent) {
 					
-					if(tournamentPlayers != null) {
+					if(main.Main.players != null) {
 
-						for(Player player : tournamentPlayers) {
+						for(Player player : main.Main.players) {
 
 							if(player.id == whiteId) {
 								
 								player.score += whiteScore;
-
 								tournamentPlayersInGame.remove(player);
+								main.Main.playersInGame.remove(player);
 								
 							}
 
 							if(player.id == blackId) {
 								
 								player.score += blackScore;
-								
 								tournamentPlayersInGame.remove(player);
+								main.Main.playersInGame.remove(player);
 								
 							}
 							
 						}
-						
+
 					}
 					
 					scoreSent = true;
+					scoreUpdated = true;
+					
+					for(ChessGame thisGame : main.Main.games) {
+
+						if(gameId == thisGame.gameId) {
+							
+							main.Main.games.remove(main.Main.games.indexOf(thisGame));
+							
+						}
+						
+					}
 					
 				}
 				

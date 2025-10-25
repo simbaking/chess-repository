@@ -16,14 +16,18 @@ import simpleChessGame.chessGame.*;
 import simpleChessGame.piece.*;
 public class Main {
 
+	
+	public static ArrayList<ChessGame> games = new ArrayList<>();
+	public static ArrayList<Player> playersInGame = new ArrayList<>();
+	public static Player[] players = new Player[8];
+	public static int[] gameIds = new int[4];
+	
+	
 	public static void main(String[] args) {
 		
 		
-		Player[] players = new Player[8];
-		ArrayList<Player> playersInGame = new ArrayList<>();
 		int[] playerIds = new int[8];
 		int userId;
-		ArrayList<ChessGame> games = new ArrayList<>();
 		JLabel[] playerCards = new JLabel[8];
 		JButton[] gameOffers = new JButton[8];
 		
@@ -93,14 +97,16 @@ public class Main {
 			        	
 			        	if(userColor) {
 			        		
-			        		ChessGame game = new ChessGame(games, playersTemp, playersInGame, gameOffers, userId, playersTemp[buttonIndex].id);
+			        		ChessGame game = new ChessGame(games, gameIds, playersTemp, playersInGame, gameOffers,
+			        				userId, playersTemp[buttonIndex].id);
 			        		games.add(game);
 			        		
 			        	}
 			        	
 			        	else {
 			        		
-			        		ChessGame game = new ChessGame(games, playersTemp, playersInGame, gameOffers, playersTemp[buttonIndex].id, userId);
+			        		ChessGame game = new ChessGame(games, gameIds, playersTemp, playersInGame, gameOffers,
+			        				playersTemp[buttonIndex].id, userId);
 			        		games.add(game);
 			        		
 			        	}
@@ -132,13 +138,16 @@ public class Main {
 			
 			
 			players = orderPlayersByScore(players, playerIds);
-			System.out.println(players[0].playerName);
 			
 			for(int i = 0; i < 8; i++) {
 				
-				playerCards[i].setText("<html>Pos " + (i + 1) + " : " + players[i].playerName
-						+ "<br> score : " + players[i].score + "</html");
-				playerCards[i].setFont(new Font("Arial", Font.PLAIN, 15));
+				if(players[i] != null && playerCards[i] != null) {
+
+					playerCards[i].setText("<html>Pos " + (i + 1) + " : " + players[i].playerName
+							+ "<br> score : " + players[i].score + "</html");
+					playerCards[i].setFont(new Font("Arial", Font.PLAIN, 15));
+					
+				}
 				
 				if(playersInGame.contains(players[i])) {
 					
@@ -172,37 +181,81 @@ public class Main {
 				
 			}
 			
-			ArrayList<ChessGame> gamesTemp = games;
-			
-			for(ChessGame game : gamesTemp) {
+
+			for(int i = 0; i < 8; i++) {
 				
-				if(game.getIsChessGameOver()) {
+				if(!playersInGame.contains(players[i])) {
 					
-					if(!game.getScoreUpdated()) {
 
-						for(Player player : players) {
+					gameOffers[i].setText(10 + " min time controls");
+					// add ability for different time controls
+					
+					final int buttonIndex = i;
+					final Player[] playersTemp = players;
+					
+					gameOffers[i].removeActionListener(gameOffers[i].getActionListeners()[0]);
+				    gameOffers[i].addActionListener(new ActionListener() {
+				        @Override
+				        public void actionPerformed(ActionEvent e) {
+				        	
+				        	if(!playersInGame.contains(playersTemp[buttonIndex])) {
 
-							if(player.id == game.getWhiteId()) {
-								
-								player.score += game.getWhiteScore();
-								
-								playersInGame.remove(player);
-								
-							}
+					        	playersInGame.add(playersTemp[buttonIndex]);
+					        	gameOffers[buttonIndex].setText(playersTemp[buttonIndex].playerName + " is in " + 10 + " min game");
+					        	
+					        	for(Player user : playersTemp) {
+					        		
+					        		if(user != null) {
 
-							if(player.id == game.getBlackId()) {
-								
-								player.score += game.getBlackScore();
-								
-								playersInGame.remove(player);
-								
-							}
-							
-						}
-						
-						game.scoreUpdated();
-						
-					}
+						        		if(user.id == userId) {
+						        			
+						        			for(int i = 0; i < playersTemp.length; i++) {
+						        				
+						        				if(user == playersTemp[i]) {
+
+								        			playersInGame.add(playersTemp[i]);
+								        			gameOffers[i].setText(playersTemp[i].playerName + " is in " + 10 + " min game");
+								        			
+						        				}
+						        				
+						        			}
+						        			
+						        		}
+						        		
+					        		}
+					        		
+					        	}
+					        	
+					        	boolean userColor = random.nextBoolean();
+					        	
+					        	if(userColor) {
+					        		
+					        		ChessGame game = new ChessGame(games, gameIds, playersTemp, playersInGame, gameOffers,
+					        				userId, playersTemp[buttonIndex].id);
+					        		
+					        		games.add(game);
+					        		
+					        	}
+					        	
+					        	else {
+					        		
+					        		ChessGame game = new ChessGame(games, gameIds, playersTemp, playersInGame, gameOffers,
+					        				playersTemp[buttonIndex].id, userId);
+					        		
+					        		games.add(game);
+					        		
+					        	}
+					        	
+				        	}
+				        	
+				        }
+				        
+				    });
+				    
+				    gameOffers[i].setBounds(25, (i * 100) + 50, 150, 50);
+				    gameOffers[i].setFont(new Font("Arial", Font.PLAIN, 12));
+				    tp.add(gameOffers[i]);
+				    
 					
 				}
 				
@@ -224,18 +277,61 @@ public class Main {
 		for(Player rankingPlayer : rearrangePlayers) {
 			
 			for(int i = 0; i < rearrangePlayers.length; i++) {
+				
+				if(rankedPlayers[i] != null) {
 
-				if(rankingPlayer.score > rankedPlayers[i].score) {
-					
-					rankingPlayers[i] = rankingPlayer;
-					
-					for(int j = 1; (i + j) < rearrangePlayers.length; j++) {
-						rankingPlayers[i + j] = rankedPlayers[i + (j - 1)];
+					if(rankingPlayer.score > rankedPlayers[i].score) {
+						
+						rankingPlayers[i] = rankingPlayer;
+						
+						int extraShift = 0; // the amount the new list shifts the old to make space for the added player at top by default is 1
+						
+						for(int j = 1; (i + j) < rearrangePlayers.length; j++) {
+							
+							
+							if(rankingPlayers[i + j] != rankingPlayer) {
+								rankingPlayers[i + j] = rankedPlayers[i + (j - 1) + extraShift];
+							}
+							
+							else {
+								
+								rankingPlayers[i + j] = rankedPlayers[i + (j - 1) + extraShift];
+								extraShift = 1;
+								
+							}
+							
+						}
+						
+						rankedPlayers = rankingPlayers;
+						break;
 					}
 					
-					rankedPlayers = rankingPlayers;
-					System.out.println(rankedPlayers[0].playerName + " r");
-					break;
+					else if(rankingPlayer.id == rankedPlayers[i].id) {
+
+						rankingPlayers[i] = rankingPlayer;
+						
+						int extraShift = 0; // the amount the new list shifts the old to make space for the added player at top by default is 1
+						
+						for(int j = 1; (i + j) < rearrangePlayers.length; j++) {
+							
+							
+							if(rankingPlayers[i + j] != rankingPlayer) {
+								rankingPlayers[i + j] = rankedPlayers[i + (j - 1) + extraShift];
+							}
+							
+							else {
+								
+								rankingPlayers[i + j] = rankedPlayers[i + (j - 1) + extraShift];
+								extraShift = 1;
+								
+							}
+							
+						}
+						
+						rankedPlayers = rankingPlayers;
+						break;
+					}
+					
 				}
 				
 			}
@@ -244,10 +340,10 @@ public class Main {
 		
 		ogPlayers = rankedPlayers;
 		
-		System.out.println(ogPlayers[0].playerName);
-		
 		for(int i = 0; i < playerIds.length; i++) {
-			rankedIds[i] = rankedPlayers[i].id;
+			if(rankedPlayers[i] != null) {
+				rankedIds[i] = rankedPlayers[i].id;
+			}
 		}
 		
 		playerIds = rankedIds;
@@ -255,5 +351,5 @@ public class Main {
 		return ogPlayers;
 		
 	}
-
+	
 }
