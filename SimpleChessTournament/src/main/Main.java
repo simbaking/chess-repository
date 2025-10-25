@@ -306,7 +306,7 @@ public class Main {
 						break;
 					}
 					
-					else if(rankingPlayer.id == rankedPlayers[i].id) {
+					/*else if(rankingPlayer.id != rankedPlayers[i].id) {
 
 						rankingPlayers[i] = rankingPlayer;
 						
@@ -330,7 +330,7 @@ public class Main {
 						
 						rankedPlayers = rankingPlayers;
 						break;
-					}
+					}*/
 					
 				}
 				
