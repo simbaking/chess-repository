@@ -3,6 +3,7 @@ package piece;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.io.InputStream;
 
 import javax.imageio.ImageIO;
 
@@ -36,9 +37,9 @@ public class Piece {
 	public BufferedImage getImage(String imagePath) {
 		
 		BufferedImage image = null;
-		
+
 		try {
-			image = ImageIO.read(getClass().getResourceAsStream(imagePath + ".png"));
+			image = ImageIO.read(getClass().getResource("res/"+imagePath + ".png"));
 		}
 		catch(IOException e){
 			e.printStackTrace();
