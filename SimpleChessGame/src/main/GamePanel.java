@@ -5,6 +5,8 @@ import javax.swing.Timer;
 
 import java.awt.*;
 import java.util.*;
+import java.util.logging.Logger;
+import java.util.logging.Level;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 
@@ -12,6 +14,7 @@ import piece.*;
 
 public class GamePanel extends JPanel implements Runnable{
 	
+	private static final Logger logger = Logger.getLogger(GamePanel.class.getName());
 	
 	public static final int WIDTH = 1100;
 	public static final int HEIGHT = 800;
@@ -213,6 +216,7 @@ public class GamePanel extends JPanel implements Runnable{
 	public void launchGame() {
 		gameThread = new Thread(this);
 		gameThread.start();
+		logger.info("Game started");
 	}
 	
 	public void setPieces() {
@@ -335,6 +339,9 @@ public class GamePanel extends JPanel implements Runnable{
 						if(isKingInCheck() && isCheckmate()) {
 							
 							gameover = true;
+							
+							String winner = currentColor == WHITE ? "White" : "Black";
+							logger.info("Game ended - Checkmate! Winner: " + winner);
 
 						}
 
@@ -342,6 +349,7 @@ public class GamePanel extends JPanel implements Runnable{
 							
 							stalemate = true;
 							endCondition = TIE;
+							logger.info("Game ended - Stalemate!");
 							
 						}
 						
@@ -374,6 +382,7 @@ public class GamePanel extends JPanel implements Runnable{
 				
 				gameover = true;
 				endCondition = TIE;
+				logger.info("Game ended - Both players offered tie!");
 				
 			}
 			
@@ -861,6 +870,7 @@ public class GamePanel extends JPanel implements Runnable{
         resignColor = WHITE;
         gameover = true;
         endCondition = BLACKWON;
+        logger.info("Game ended - White resigned. Winner: Black");
         
 	}
 	
@@ -870,6 +880,7 @@ public class GamePanel extends JPanel implements Runnable{
         resignColor = BLACK;
         gameover = true;
         endCondition = WHITEWON;
+        logger.info("Game ended - Black resigned. Winner: White");
         
 	}
 	

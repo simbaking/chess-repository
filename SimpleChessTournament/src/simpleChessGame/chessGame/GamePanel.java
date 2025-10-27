@@ -9,6 +9,8 @@ import main.Player;
 
 import java.awt.*;
 import java.util.*;
+import java.util.logging.Logger;
+import java.util.logging.Level;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 
@@ -19,6 +21,7 @@ import simpleChessGame.piece.*;
 
 public class GamePanel extends JPanel implements Runnable{
 	
+	private static final Logger logger = Logger.getLogger(GamePanel.class.getName());
 	
 	public static final int WIDTH = 1100;
 	public static final int HEIGHT = 800;
@@ -293,6 +296,7 @@ public class GamePanel extends JPanel implements Runnable{
 		tournamentPlayersInGame = playersInGame;
 		tournamentGameOffers = gameOffers;
 		
+		logger.info("Game started - Game ID: " + gameId + ", White Player ID: " + whitePlayerId + ", Black Player ID: " + blackPlayerId);
 		
 	}
 	
@@ -375,23 +379,45 @@ public class GamePanel extends JPanel implements Runnable{
 				
 				if(!scoreSent) {
 					
+					String gameResult;
+					if(endCondition == WHITEWON) {
+						gameResult = "White Wins";
+					} else if(endCondition == BLACKWON) {
+						gameResult = "Black Wins";
+					} else {
+						gameResult = "Tie";
+					}
+					
+					logger.info("Game ended - Game ID: " + gameId + ", Result: " + gameResult + 
+						", White Score: " + whiteScore + ", Black Score: " + blackScore);
+					
 					if(main.Main.players != null) {
 
 						for(Player player : main.Main.players) {
 
 							if(player.id == whiteId) {
 								
+								int oldScore = player.score;
 								player.score += whiteScore;
 								tournamentPlayersInGame.remove(player);
 								main.Main.playersInGame.remove(player);
+								
+								logger.info("Player score updated - Player ID: " + player.id + 
+									", Old Score: " + oldScore + ", New Score: " + player.score + 
+									", Points Added: " + whiteScore);
 								
 							}
 
 							if(player.id == blackId) {
 								
+								int oldScore = player.score;
 								player.score += blackScore;
 								tournamentPlayersInGame.remove(player);
 								main.Main.playersInGame.remove(player);
+								
+								logger.info("Player score updated - Player ID: " + player.id + 
+									", Old Score: " + oldScore + ", New Score: " + player.score + 
+									", Points Added: " + blackScore);
 								
 							}
 							
