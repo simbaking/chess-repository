@@ -41,7 +41,43 @@ public class Piece {
 		BufferedImage image = null;
 		
 		try {
-			image = ImageIO.read(getClass().getResourceAsStream(imagePath + ".png"));
+			String fullPath = imagePath + ".png";
+			
+			// Try with leading slash first (for resources on classpath root)
+			java.net.URL resourceUrl = getClass().getResource(fullPath);
+			
+			// If not found, try without leading slash (relative to package)
+			if (resourceUrl == null) {
+				resourceUrl = getClass().getResource("piece" + fullPath);
+			}
+			
+			// If still not found, try from bin directory directly
+			if (resourceUrl == null) {
+				try {
+					// Get current working directory
+					String workingDir = System.getProperty("user.dir");
+					
+					// Try bin directory
+					java.io.File binFile = new java.io.File(workingDir, "bin" + fullPath);
+					
+					if (binFile.exists()) {
+						resourceUrl = binFile.toURI().toURL();
+					} else {
+						// Try IntelliJ's output directory structure
+						java.io.File outFile = new java.io.File(workingDir, "out/production/chess-repository" + fullPath);
+						
+						if (outFile.exists()) {
+							resourceUrl = outFile.toURI().toURL();
+						}
+					}
+				} catch (Exception e) {
+					// File loading failed, continue
+				}
+			}
+			
+			if (resourceUrl != null) {
+				image = ImageIO.read(resourceUrl);
+			}
 		}
 		catch(IOException e){
 			e.printStackTrace();
