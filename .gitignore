@@ -1,0 +1,23 @@
+# macOS
+.DS_Store
+**/.DS_Store
+
+# IDEs
+.idea/
+*.iml
+*.ipr
+*.iws
+
+# Build output
+bin/
+out/
+target/
+
+# Eclipse
+.classpath
+.project
+.settings/
+
+# IntelliJ
+*.iml
+.idea/
