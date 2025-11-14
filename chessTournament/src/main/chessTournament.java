@@ -1,8 +1,9 @@
 package main;
 
 import util.log.*;
+import java.util.logging.*;
 
-public class chessTournament {
+public class chessTournament extends Log{
 	
 	
 	public static Player[] tournamentPlayers = new Player[8];
@@ -16,8 +17,10 @@ public class chessTournament {
 		for(int i = 0; i < (tournamentPlayers.length - 1); i++) {
 			tournamentPlayers[i] = new Player( "CPU " + (i + 1), true, tournamentPlayerIds);
 		}
+		logger.log(Level.INFO, "tournamentPlayers array initialized except last Player who will be the user" + 
+				"\n ..................................................");
 		
-
+		
 	}
 
 	

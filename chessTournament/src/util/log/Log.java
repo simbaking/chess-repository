@@ -4,20 +4,20 @@ import java.util.logging.*;
 
 public class Log {
 
-	protected Logger logger = Logger.getLogger("mylog");
+	protected static Logger logger = Logger.getLogger("mylog");
 	
-	public void init() {
+	public Log() {
 		
 		FileHandler fh;
 		
 		try {
 			
-			fh = new FileHandler("/Users/chang/git/chess-repository/chessTournament/res/logging/myLog.txt");
+			fh = new FileHandler("C:\\Users\\chang\\git\\chess-repository\\chessTournament\\res\\logging\\myLog.txt");
 			logger.addHandler(fh);
 			SimpleFormatter formatter = new SimpleFormatter();
 			fh.setFormatter(formatter);
 			logger.setLevel(Level.INFO);
-			logger.info("Logger running \n" + "..........................................................");
+			logger.info("Logger running \n" + "..................................................");
 			
 		}
 		
