@@ -1,18 +1,19 @@
 package util.log;
 
 import java.util.logging.*;
+import java.util.logging.FileHandler.*;
 
 public class Log {
 
-	protected static Logger logger = Logger.getLogger("mylog");
+	public Logger logger = Logger.getLogger("mylog");
 	
-	public Log() {
+	public void init() {
 		
 		FileHandler fh;
 		
 		try {
 			
-			fh = new FileHandler("C:\\Users\\chang\\git\\chess-repository\\chessTournament\\res\\logging\\myLog.txt");
+			fh = new FileHandler("/Users/chang/git/chess-repository/chessTournament/res/logging/myLog.txt");
 			logger.addHandler(fh);
 			SimpleFormatter formatter = new SimpleFormatter();
 			fh.setFormatter(formatter);

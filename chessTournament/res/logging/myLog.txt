@@ -1,0 +1,6 @@
+Nov 14, 2025 6:37:46 AM util.log.Log init
+INFO: Logger running 
+..................................................
+Nov 14, 2025 6:37:46 AM main.chessTournament main
+INFO: tournamentPlayers array initialized except last Player who will be the user
+ ..................................................

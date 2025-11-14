@@ -4,8 +4,11 @@ import javax.swing.*;
 import chessGame.game.*;
 
 public class ChessGame {
+	
+	public static int whitePlayerId;
+	public static int blackPlayerId;
 
-	public static void ChessGame() {
+	public ChessGame() {
 		
 		
 		JFrame window = new JFrame("chess game");
