@@ -18,7 +18,13 @@ public class chessTournament extends Log{
 	public static void main(String[] args) {
 		
 		
+		int userId = 1;
+		
 		l.init();
+		
+		tournamentPlayerIds[0] = userId;
+		l.logger.log(Level.INFO, "user id initailized" +
+				"\n ..................................................");
 		
 		for(int i = 0; i < (tournamentPlayers.length - 1); i++) {
 			tournamentPlayers[i] = new Player( "CPU " + (i + 1), true, tournamentPlayerIds);
